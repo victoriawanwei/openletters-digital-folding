@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Issue #105 Iman Fayyad to Vitruvius, folded</title>
+<title>Digital Folding — Open Letters</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&display=swap" rel="stylesheet">
@@ -20,10 +20,28 @@
 :root[data-theme="dark"]{ --paper:#efefea; --ink:#000; }
 *,*::before,*::after{box-sizing:inherit}
 html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
-body{height:100%;margin:0;overflow:hidden;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.3}
+body{height:100%;margin:0;overflow:hidden;background-color:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.3}
 #stage{position:fixed;inset:0}
+#bg{position:fixed;inset:0;pointer-events:none}
+#bg.dots{background-image:radial-gradient(circle,rgba(0,0,0,.2) 1px,transparent 1.3px);background-size:22px 22px;background-position:11px 11px}
+#bg.grid{background-image:
+  linear-gradient(rgba(0,0,0,.11) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.11) 1px,transparent 1px),
+  linear-gradient(rgba(0,0,0,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.05) 1px,transparent 1px);
+  background-size:110px 110px,110px 110px,22px 22px,22px 22px;background-position:var(--gutter) 0}
+#bg.guides{left:var(--gutter);right:var(--gutter);
+  background-image:linear-gradient(to right,rgba(0,0,0,.045) 0 calc(100% - 20px),transparent calc(100% - 20px)),
+    linear-gradient(to right,rgba(0,0,0,.16) 1px,transparent 1px);
+  background-size:calc((100% + 20px)/12) 100%,calc((100% + 20px)/12) 100%}
+#bg.guides::after{content:"";position:absolute;top:0;bottom:0;right:0;width:1px;background:rgba(0,0,0,.16)}
+.subbar{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-top:10px;pointer-events:none!important}
+.subbar #hint{margin:0}
+.bgpick{display:flex;gap:12px;align-items:baseline;pointer-events:auto;flex:none}
+nav button:focus-visible,.bgpick button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.bgpick button{background:none;border:0;padding:0;cursor:pointer;font-size:14px;line-height:1.3;color:var(--ink-faint);font-family:var(--sans)}
+.bgpick button[aria-pressed="true"]{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.bgpick button:hover{color:var(--ink)}
 canvas{display:block;width:100%;height:100%;touch-action:none}
-header{position:fixed;left:0;right:0;top:0;padding:calc(18px + env(safe-area-inset-top,0px)) var(--gutter) 0;pointer-events:none}
+header{position:fixed;left:0;right:0;top:0;padding:calc(18px + env(safe-area-inset-top,0px)) var(--gutter) 0;pointer-events:none;background:var(--paper);padding-bottom:6px}
 header>*{pointer-events:auto}
 .masthead{margin:0 0 34px;font-weight:400;font-size:15px}
 .masthead a{color:inherit;text-decoration:none}
@@ -61,14 +79,23 @@ nav button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 </style>
 </head>
 <body>
+<div id="bg" class="dots" aria-hidden="true"></div>
 <div id="stage"><canvas id="paper" aria-label="Sheets of Open Letters issue 105. Cover on the front, Iman Fayyad's letter to Vitruvius on the back. Drag a sheet to fold it."></canvas></div>
 <header>
   <p class="masthead"><a href="https://openletters-online.com" target="_blank" rel="noopener">Open Letters<br>Printed and distributed at Harvard GSD</a></p>
   <nav aria-label="Sheets">
-    <h1>Open Letters — Digital Folding</h1>
+    <h1>Digital Folding</h1>
     <button id="new" title="New sheet (N)">New sheet +</button>
   </nav>
-  <p id="hint" aria-live="polite"></p>
+  <div class="subbar">
+    <p id="hint" aria-live="polite"></p>
+    <div class="bgpick" role="group" aria-label="Background (B)" title="Background (B)">
+      <button data-bg="dots" aria-pressed="true">Dots</button>
+      <button data-bg="grid" aria-pressed="false">Grid</button>
+      <button data-bg="guides" aria-pressed="false">Guides</button>
+      <button data-bg="none" aria-pressed="false">Plain</button>
+    </div>
+  </div>
 </header>
 <footer aria-label="Paper tools">
   <div class="modes">
@@ -224,6 +251,9 @@ function sync(){removeBtn.disabled=sheets.length<2;
   else hintEl.textContent=sheets.length>1?'Drag any sheet to fold it. Hold Shift to move it instead.':'Drag any part of the sheet to fold it over. Flip it to fold the other way.';}
 function setMode(m){mode=m;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===m));sync();}
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{cancelIntro();setMode(b.dataset.mode);}));
+const BGS=['dots','grid','guides','none'];let bg='dots';
+function setBg(v){bg=v;document.getElementById('bg').className=v;document.querySelectorAll('[data-bg]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.bg===v));}
+document.querySelectorAll('[data-bg]').forEach(b=>b.addEventListener('click',()=>setBg(b.dataset.bg)));
 function tween(dur,fn,done){
   busy=true;
   if(reduce||dur<=0){fn(1);busy=false;done&&done();draw();return;}
@@ -288,7 +318,7 @@ removeBtn.addEventListener('click',remove);
 window.addEventListener('keydown',e=>{
   if(e.target.closest&&e.target.closest('button')&&(e.key===' '||e.key==='Enter'))return;
   const k=e.key.toLowerCase();
-  if(k==='delete'||k==='backspace')remove();else if(k==='f')flip();else if(k==='u')unfold();else if(k==='n')addSheet();else if(k==='1')setMode('fold');else if(k==='2')setMode('move');
+  if(k==='delete'||k==='backspace')remove();else if(k==='f')flip();else if(k==='u')unfold();else if(k==='n')addSheet();else if(k==='b')setBg(BGS[(BGS.indexOf(bg)+1)%BGS.length]);else if(k==='1')setMode('fold');else if(k==='2')setMode('move');
   else if(k==='arrowright'&&sheets.length>1){active=(active+1)%sheets.length;draw();}
   else if(k==='arrowleft'&&sheets.length>1){active=(active+sheets.length-1)%sheets.length;draw();}
 });
