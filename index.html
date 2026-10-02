@@ -52,8 +52,7 @@ nav h1,nav button{
 }
 nav h1{margin:0}
 nav h1 a{color:inherit;text-decoration:none}
-nav h1 .arrow{font-family:var(--serif),"Apple Symbols","Segoe UI Symbol",sans-serif;font-variant-emoji:text}
-nav h1 a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+nav h1 .arrow{display:inline-block;height:.8em;width:1em;vertical-align:-.02em;margin-left:.08em;overflow:visible}
 footer{
   position:fixed;left:0;right:0;bottom:0;padding:0 var(--gutter) calc(16px + env(safe-area-inset-bottom,0px));
   background:var(--paper);
@@ -86,7 +85,7 @@ nav button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 <div id="stage"><canvas id="paper" aria-label="Sheets of the current Open Letters issue: the cover on the front, the letter on the back. Drag a sheet to fold it."></canvas></div>
 <header>
   <nav aria-label="Sheets">
-    <h1><a href="https://openletters-online.com/Main" target="_top">Folding&nbsp;<span class="arrow">↩&#xFE0E;</span></a></h1>
+    <h1><a href="https://openletters-online.com/Main" target="_top" aria-label="Folding — back to main menu">Folding<svg class="arrow" viewBox="38 78 264 212" aria-hidden="true"><path d="M104 216.5H226A62.5 62.5 0 0 0 226 91.5H222" fill="none" stroke="currentColor" stroke-width="23"/><path d="M40 216.5L108 148V287Z" fill="currentColor"/></svg></a></h1>
     <button id="new" title="New sheet (N)">New sheet +</button>
   </nav>
   <div class="subbar">
